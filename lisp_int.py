@@ -8,9 +8,22 @@ def parse(src):
     while '(' in tokens or ')' in tokens:
         open_paren = len(tokens) - tokens[-1::-1].index('(') - 1
         close_paren = tokens.index(')', open_paren)
-        internal_seq = tokens[open_paren + 1:close_paren]
+        internal_seq = convert(tokens[open_paren + 1:close_paren])
         tokens = tokens[:open_paren] + [internal_seq] + tokens[close_paren + 1:]
     return tokens[0]
+
+
+def convert(seq):
+    res = []
+    for item in seq:
+        try:
+            try:
+                res.append(int(item))
+            except ValueError:
+                res.append(float(item))
+        except (ValueError, TypeError):
+            res.append(item)
+    return res
 
 
 def calc(expression):
