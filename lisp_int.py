@@ -1,7 +1,3 @@
-src = r"(+ 2 (* 2 (* (+ 4 1) (/ 8 2))))"
-lisp2 = r"(define (size 2))"
-
-
 def parse(src):
     src = str(src.replace('(', ' ( ').replace(')', ' ) '))
     tokens = src.split()
@@ -26,13 +22,40 @@ def convert(seq):
     return res
 
 
-def calc(expression):
-    operands = expression[1:-1].split(' ')
-    if operands[0] == '+':
-        return int(operands[1]) + int(operands[2])
-    elif operands[0] == '-':
-        return int(operands[1]) - int(operands[2])
-    elif operands[0] == '*':
-        return int(operands[1]) * int(operands[2])
-    elif operands[0] == '/':
-        return int(int(operands[1]) / int(operands[2]))
+def sub(minuend, *args):
+    return -minuend if len(args) == 0 else minuend - sum(args)
+
+
+def mul(*args):
+    result = 1
+    for item in args:
+        result = result * item
+    return result
+
+
+def division(dividend, *args):
+    if len(args) == 0:
+        return 1 / dividend
+    else:
+        for item in args:
+            dividend = dividend / item
+        return dividend
+
+
+ENV = {
+    '+': lambda *args: sum(args),
+    '-': sub,
+    '*': mul,
+    '/': division,
+}
+
+
+def evaluate(expression):
+    fn = ENV[expression[0]]
+    operands = []
+    for exp in expression[1:]:
+        if isinstance(exp, list):
+            operands.append(evaluate(exp))
+        else:
+            operands.append(exp)
+    return fn(*operands)
